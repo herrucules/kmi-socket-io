@@ -4,6 +4,7 @@ var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
+app.set('port', process.env.PORT || 3000);
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -22,8 +23,8 @@ app.get('/draw', function (req, res) {
   res.send('ok')
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen(port, function(){
+  console.log('listening on *');
 });
 
 io.on('connection', function(socket){
