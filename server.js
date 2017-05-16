@@ -1,10 +1,12 @@
 var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var http = require('http');
+var httpApp = http.Server(app);
+var io = require('socket.io')(httpApp);
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
 var port = process.env.port || 1337;
+var dmdServices = require('./dmdservices');
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -14,26 +16,41 @@ app.get('/', function(req, res){
 });
 
 app.post('/total-project', function (req, res) {
-	io.emit('total-project', req.body.total);
-	res.send('ok')
+	dmdServices.totalProject(io, http.request);
+	res.send('');
 });
 
-app.get('/draw', function (req, res) {
-  io.emit('draw', req.query);
-  res.send('ok')
+app.post('/media-playlist', function (req, res) {
+  dmdServices.mediaPlaylist(io, http.request);
+  res.send('');
 });
 
-http.listen(port, function(){
+app.post('/stream-update', function (req, res) {
+  dmdServices.collabeesStream(io, http.request, 1);
+  res.send('');
+});
+
+httpApp.listen(port, function(){
   console.log('listening on *:'+port);
 });
 
 io.on('connection', function(socket){
   console.log('a user connected');
-  // socket.on('now-playing', function(msg) {
-  // 	// panggil service ke collabees..
-  // 	console.log(msg);
-  // });
+
+  initPushData();
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
 });
+
+function initPushData() {
+  dmdServices.collabeesStream(io, http.request);
+  // dmdServices.totalProject(io, http.request);
+  
+  // dmdServices.totalJobRequest(io, http.request);
+  
+  // dmdServices.totalIncompleteJob(io, http.request);
+  // dmdServices.mediaPlaylist(io, http.request);
+  // ...
+}
