@@ -6,6 +6,7 @@ var constants = {
 	PUSH_TOTAL_INCOMPLETE_JOB: "push-incomplete-job",
 	PUSH_MEDIA_PLAYLIST: "push-media-playlist",
 	PUSH_JOB_PHASES: "push-job-phases",
+	PUSH_COLLABEES_STREAMS: "push-collabees-streams",
 	PUSH_COLLABEES_STREAM: "push-collabees-stream"
 	}
 

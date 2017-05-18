@@ -26,7 +26,7 @@ app.post('/media-playlist', function (req, res) {
 });
 
 app.post('/stream-update', function (req, res) {
-  dmdServices.collabeesStream(io, http.request, 1);
+  dmdServices.collabeesSingleStream(io, http.request, req.body.since);
   res.send('');
 });
 
@@ -45,12 +45,12 @@ io.on('connection', function(socket){
 });
 
 function initPushData() {
-  dmdServices.collabeesStream(io, http.request);
-  // dmdServices.totalProject(io, http.request);
+  dmdServices.collabeesStreams(io, http.request);
+  dmdServices.totalProject(io, http.request);
   
-  // dmdServices.totalJobRequest(io, http.request);
+  dmdServices.totalJobRequest(io, http.request);
   
-  // dmdServices.totalIncompleteJob(io, http.request);
-  // dmdServices.mediaPlaylist(io, http.request);
+  dmdServices.totalIncompleteJob(io, http.request);
+  dmdServices.mediaPlaylist(io, http.request);
   // ...
 }

@@ -35,7 +35,9 @@ module.exports.mediaPlaylist = function (io, request) {
 		request, 
 		'admin-ajax.php?action=tv_services&kmi_tv&liveToday=1',
 		function(res) {
-			io.emit(CONST.PUSH_MEDIA_PLAYLIST, res);
+			io.emit(CONST.PUSH_MEDIA_PLAYLIST, 
+				JSON.stringify(transformMedia(JSON.parse(res)))
+				);
 		});
 };
 
@@ -50,11 +52,23 @@ module.exports.jobPhases = function (io, request) {
 		});
 };
 
-module.exports.collabeesStream = function (io, request, total) {
+module.exports.collabeesStreams = function (io, request, total) {
 	total = total || 3;
 	utility.fetch(
 		request,
-		'admin-ajax.php?action=get_feed&latest='+ moment().tz('Asia/Jakarta').format() +'&nonce=e07bf53f7a&page=1&total='+total+'&km_tv',
+		'admin-ajax.php?action=get_feed&kmi_tv&nonce=e07bf53f7a&page=1&total='+total,
+		function(res) {
+			io.emit(CONST.PUSH_COLLABEES_STREAMS, 
+				JSON.stringify(transformStreams(JSON.parse(res)))
+				);
+		});
+};
+
+module.exports.collabeesSingleStream = function (io, request, since) {
+	since = since || moment().tz('Asia/Jakarta').format();
+	utility.fetch(
+		request,
+		'admin-ajax.php?action=get_feed&kmi_tv&nonce=e07bf53f7a&page=1&total=1&latest='+since,
 		function(res) {
 			io.emit(CONST.PUSH_COLLABEES_STREAM, 
 				JSON.stringify(transformStream(JSON.parse(res)))
@@ -95,12 +109,13 @@ function transformJobPhase(data) {
 	return phases;
 }
 
-function transformStream(data) {
+function transformStreams(data) {
 	var streams = [];
 
 	if (data.feed) {
 		streams = _.map(data.feed, function(stream) {
 			return {
+				streamID: stream.FeedID,
 				subject: stream.display_name,
 				predicate: stream.title,
 				object: stream.object.name,
@@ -113,4 +128,62 @@ function transformStream(data) {
 	return streams;
 }
 
+function transformStream(data) {
+	var stream = {};
 
+	if (data.feed.length == 1) {
+		stream = data.feed[0];
+		stream = {
+				streamID: stream.FeedID,
+				subject: stream.display_name,
+				predicate: stream.title,
+				object: stream.object.name,
+				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
+				picture: stream.theUser.profile_picture
+		};
+	}
+
+	return stream;
+}
+
+function transformMedia(data) {
+	var playlist = [];
+
+	if (data.content_tv.length) {
+		playlist = _.map(data.content_tv, function(media) {
+			return {
+				contentID: media.contentID,
+				mediaType: media.mediaType,
+				title: media.title,
+				URL: media.mediaType == 'youtube' ? parseVideo(media.URL).id : media.URL
+			}
+		});
+	}
+
+	return playlist;
+}
+
+function parseVideo (url) {
+	    // - Supported YouTube URL formats:
+	    //   - http://www.youtube.com/watch?v=My2FRPA3Gf8
+	    //   - http://youtu.be/My2FRPA3Gf8
+	    //   - https://youtube.googleapis.com/v/My2FRPA3Gf8
+	    // - Supported Vimeo URL formats:
+	    //   - http://vimeo.com/25451551
+	    //   - http://player.vimeo.com/video/25451551
+	    // - Also supports relative URLs:
+	    //   - //player.vimeo.com/video/25451551
+
+	    url.match(/(http:|https:|)\/\/(player.|www.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com))\/(video\/|embed\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+
+	    if (RegExp.$3.indexOf('youtu') > -1) {
+	        var type = 'youtube';
+	    } else if (RegExp.$3.indexOf('vimeo') > -1) {
+	        var type = 'vimeo';
+	    }
+
+	    return {
+	        type: type,
+	        id: RegExp.$6
+	    };
+	}
