@@ -17,16 +17,22 @@ module.exports.totalJobRequest = function (io, request) {
 		request, 
 		'admin-ajax.php?kmi_tv=1&action=get_job_request&groupid=1&nonce=b981def24c&total=-1&get_total=1',
 		function(res) {
-			io.emit(CONST.PUSH_TOTAL_JOB_REQUEST, res);
+			totalIncompleteJob(io, request, JSON.parse(res).total);
+			//io.emit(CONST.PUSH_TOTAL_JOB_REQUEST, res);
 		});
 };
 
-module.exports.totalIncompleteJob = function (io, request) {
+function totalIncompleteJob(io, request, totalJobRequest) {
 	utility.fetch(
 		request, 
 		'admin-ajax.php?action=get_job_request&groupid=1&nonce=b981def24c&total=-1&kmi_tv&completed=0&get_total=1',
 		function(res) {
-			io.emit(CONST.PUSH_TOTAL_INCOMPLETE_JOB, res);
+			res = JSON.parse(res);
+			var retval = {
+				totalIncompleteJob: res.total,
+				totalJobRequest: totalJobRequest
+			}
+			io.emit(CONST.PUSH_TOTAL_JOB_REQUEST, JSON.stringify(retval));
 		});
 };
 

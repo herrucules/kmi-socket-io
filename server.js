@@ -50,7 +50,6 @@ function initPushData() {
   
   dmdServices.totalJobRequest(io, http.request);
   
-  dmdServices.totalIncompleteJob(io, http.request);
   dmdServices.mediaPlaylist(io, http.request);
 
   dmdServices.jobPhases(io, http.request);
