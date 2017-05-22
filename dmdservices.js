@@ -60,6 +60,7 @@ module.exports.collabeesStreams = function (io, request, total) {
 		function(res) {
 			io.emit(CONST.PUSH_COLLABEES_STREAMS, 
 				JSON.stringify(transformStreams(JSON.parse(res)))
+				// res
 				);
 		});
 };
@@ -117,10 +118,12 @@ function transformStreams(data) {
 			return {
 				streamID: stream.FeedID,
 				subject: stream.display_name,
-				predicate: stream.title,
-				object: stream.object.name,
+				predicate: ' do '+ stream.title + ('' || ' '+stream.object.PhaseName),
+				object: stream.object.name || stream.object.TaskTitle,
+				type: stream.FeedType,
 				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
-				picture: stream.theUser.profile_picture
+				picture: stream.theUser.profile_picture,
+				orig:stream
 			};
 		});
 	}
@@ -136,8 +139,9 @@ function transformStream(data) {
 		stream = {
 				streamID: stream.FeedID,
 				subject: stream.display_name,
-				predicate: stream.title,
-				object: stream.object.name,
+				predicate: ' do '+ stream.title + ('' || ' '+stream.object.PhaseName),
+				object: stream.object.name || stream.object.TaskTitle,
+				type: stream.FeedType,
 				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
 				picture: stream.theUser.profile_picture
 		};
