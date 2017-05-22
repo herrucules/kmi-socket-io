@@ -118,12 +118,11 @@ function transformStreams(data) {
 			return {
 				streamID: stream.FeedID,
 				subject: stream.display_name,
-				predicate: ' do '+ stream.title + ('' || ' '+stream.object.PhaseName),
+				predicate: ' do "'+ stream.title + ('' || ' '+stream.object.PhaseName) + '"',
 				object: stream.object.name || stream.object.TaskTitle,
 				type: stream.FeedType,
 				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
-				picture: stream.theUser.profile_picture,
-				orig:stream
+				picture: stream.theUser.profile_picture
 			};
 		});
 	}
@@ -139,7 +138,7 @@ function transformStream(data) {
 		stream = {
 				streamID: stream.FeedID,
 				subject: stream.display_name,
-				predicate: ' do '+ stream.title + ('' || ' '+stream.object.PhaseName),
+				predicate: ' do "'+ stream.title + ('' || ' '+stream.object.PhaseName) + '"',
 				object: stream.object.name || stream.object.TaskTitle,
 				type: stream.FeedType,
 				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
