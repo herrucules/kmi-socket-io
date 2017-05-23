@@ -26,7 +26,7 @@ app.get('/media-playlist', function (req, res) {
 });
 
 app.get('/stream-update', function (req, res) {
-  dmdServices.collabeesSingleStream(io, http.request, req.params.since);
+  dmdServices.collabeesSingleStream(io, http.request, req.query.since);
   res.send('');
 });
 

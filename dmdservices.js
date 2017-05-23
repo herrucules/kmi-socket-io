@@ -14,16 +14,6 @@ module.exports.totalProject = function (io, request) {
 	totalNearDeadlineProject(io, request);
 };
 
-function totalNearDeadlineProject (io, request) {
-	utility.fetch(
-		request, 
-		'admin-ajax.php?action=get_project&completed=0&groupid=1&have_dateline=true&nonce=839c4ae40e&total=-1',
-		function(res) {
-			
-			// io.emit(CONST.PUSH_TOTAL_NEAR_DEADLINE_PROJECT, res);
-		});
-}
-
 module.exports.totalJobRequest = function (io, request) {
 	utility.fetch(
 		request, 
@@ -31,20 +21,6 @@ module.exports.totalJobRequest = function (io, request) {
 		function(res) {
 			totalIncompleteJob(io, request, JSON.parse(res).total);
 			//io.emit(CONST.PUSH_TOTAL_JOB_REQUEST, res);
-		});
-};
-
-function totalIncompleteJob(io, request, totalJobRequest) {
-	utility.fetch(
-		request, 
-		'admin-ajax.php?action=get_job_request&groupid=1&nonce=b981def24c&total=-1&kmi_tv&completed=0&get_total=1',
-		function(res) {
-			res = JSON.parse(res);
-			var retval = {
-				totalIncompleteJob: res.total,
-				totalJobRequest: totalJobRequest
-			}
-			io.emit(CONST.PUSH_TOTAL_JOB_REQUEST, JSON.stringify(retval));
 		});
 };
 
@@ -92,6 +68,38 @@ module.exports.collabeesSingleStream = function (io, request, since) {
 			io.emit(CONST.PUSH_COLLABEES_STREAM, 
 				JSON.stringify(transformStream(JSON.parse(res)))
 				);
+		});
+};
+
+function totalNearDeadlineProject (io, request) {
+	utility.fetch(
+		request, 
+		'admin-ajax.php?action=get_project&completed=0&groupid=1&have_dateline=true&nonce=839c4ae40e&total=-1&kmi_tv',
+		function(res) {
+			res = JSON.parse(res);
+			var total = _.reduce(res.project, function(sum, project) {
+										var daydiff = moment(project.EndDate).diff(moment(), 'days');
+										if ( daydiff >= 0 && daydiff <= 14)
+											return sum + 1;		
+										else
+											return sum;		
+									}, 0);
+
+			io.emit(CONST.PUSH_TOTAL_NEAR_DEADLINE_PROJECT, JSON.stringify({total:total}));
+		});
+}
+
+function totalIncompleteJob(io, request, totalJobRequest) {
+	utility.fetch(
+		request, 
+		'admin-ajax.php?action=get_job_request&groupid=1&nonce=b981def24c&total=-1&kmi_tv&completed=0&get_total=1',
+		function(res) {
+			res = JSON.parse(res);
+			var retval = {
+				totalIncompleteJob: res.total,
+				totalJobRequest: totalJobRequest
+			}
+			io.emit(CONST.PUSH_TOTAL_JOB_REQUEST, JSON.stringify(retval));
 		});
 };
 
