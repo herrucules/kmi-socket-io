@@ -6,11 +6,23 @@ var moment = require('moment-timezone');
 module.exports.totalProject = function (io, request) {
 	utility.fetch(
 		request, 
-		'admin-ajax.php?kmi_tv=1&action=get_project&nonce=1&groupid=1&orderby=startdate&total=-1&get_total=1',
+		'admin-ajax.php?kmi_tv=1&action=get_project&nonce=1&groupid=1&total=-1&get_total=1',
 		function(res) {
 			io.emit(CONST.PUSH_TOTAL_PROJECT, res);
 		});
+
+	totalNearDeadlineProject(io, request);
 };
+
+function totalNearDeadlineProject (io, request) {
+	utility.fetch(
+		request, 
+		'admin-ajax.php?action=get_project&completed=0&groupid=1&have_dateline=true&nonce=839c4ae40e&total=-1',
+		function(res) {
+			
+			// io.emit(CONST.PUSH_TOTAL_NEAR_DEADLINE_PROJECT, res);
+		});
+}
 
 module.exports.totalJobRequest = function (io, request) {
 	utility.fetch(

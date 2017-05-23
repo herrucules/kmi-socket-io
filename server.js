@@ -2,31 +2,31 @@ var app = require('express')();
 var http = require('http');
 var httpApp = http.Server(app);
 var io = require('socket.io')(httpApp);
-var bodyParser = require('body-parser');
-var multer = require('multer'); // v1.0.5
-var upload = multer(); // for parsing multipart/form-data
+// var bodyParser = require('body-parser');
+// var multer = require('multer'); // v1.0.5
+// var upload = multer(); // for parsing multipart/form-data
 var port = process.env.port || 1337;
 var dmdServices = require('./dmdservices');
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+// app.use(bodyParser.json()); // for parsing application/json
+// app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
 });
 
-app.post('/total-project', function (req, res) {
+app.get('/total-project', function (req, res) {
 	dmdServices.totalProject(io, http.request);
 	res.send('');
 });
 
-app.post('/media-playlist', function (req, res) {
+app.get('/media-playlist', function (req, res) {
   dmdServices.mediaPlaylist(io, http.request);
   res.send('');
 });
 
-app.post('/stream-update', function (req, res) {
-  dmdServices.collabeesSingleStream(io, http.request, req.body.since);
+app.get('/stream-update', function (req, res) {
+  dmdServices.collabeesSingleStream(io, http.request, req.params.since);
   res.send('');
 });
 
