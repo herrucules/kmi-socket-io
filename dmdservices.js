@@ -65,7 +65,7 @@ module.exports.collabeesSingleStream = function (io, request, since) {
 	since = since || moment().format();
 	utility.fetch(
 		request,
-		'admin-ajax.php?action=get_feed&kmi_tv&nonce=e07bf53f7a&page=1&total=1&latest='+since,
+		'admin-ajax.php?action=get_feed&kmi_tv&nonce=e07bf53f7a&page=1&total=1&latest='+encodeURI(since),
 		function(res) {
 			io.emit(CONST.PUSH_COLLABEES_STREAM, 
 				JSON.stringify(transformStream(JSON.parse(res)))
