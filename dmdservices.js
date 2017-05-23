@@ -3,6 +3,8 @@ var utility = require('./utility');
 var _ = require('lodash');
 var moment = require('moment-timezone');
 
+moment.tz.setDefault("Asia/Jakarta");
+
 module.exports.totalProject = function (io, request) {
 	utility.fetch(
 		request, 
@@ -60,7 +62,7 @@ module.exports.collabeesStreams = function (io, request, total) {
 };
 
 module.exports.collabeesSingleStream = function (io, request, since) {
-	since = since || moment().tz('Asia/Jakarta').format();
+	since = since || moment().format();
 	utility.fetch(
 		request,
 		'admin-ajax.php?action=get_feed&kmi_tv&nonce=e07bf53f7a&page=1&total=1&latest='+since,
@@ -77,7 +79,14 @@ function totalNearDeadlineProject (io, request) {
 		'admin-ajax.php?action=get_project&completed=0&groupid=1&have_dateline=true&nonce=839c4ae40e&total=-1&kmi_tv',
 		function(res) {
 			res = JSON.parse(res);
-			var total = _.reduce(res.project, function(sum, project) {
+			var totalNearDeadline = _.reduce(res.project, function(sum, project) {
+										var daydiff = moment(project.EndDate).diff(moment(), 'days');
+										if ( daydiff >= 0 && daydiff <= 14)
+											return sum + 1;		
+										else
+											return sum;		
+									}, 0);
+			var totalOverdue = _.reduce(res.project, function(sum, project) {
 										var daydiff = moment(project.EndDate).diff(moment(), 'days');
 										if ( daydiff >= 0 && daydiff <= 14)
 											return sum + 1;		
@@ -85,7 +94,12 @@ function totalNearDeadlineProject (io, request) {
 											return sum;		
 									}, 0);
 
-			io.emit(CONST.PUSH_TOTAL_NEAR_DEADLINE_PROJECT, JSON.stringify({total:total}));
+			var total = {
+				totalNearDeadline: totalNearDeadline,
+				totalOverdue: totalOverdue
+			}
+
+			io.emit(CONST.PUSH_TOTAL_NEAR_DEADLINE_PROJECT, JSON.stringify(total));
 		});
 }
 
@@ -147,7 +161,7 @@ function transformStreams(data) {
 				predicate: ' do "'+ ( stream.title || stream.object.PhaseName ) + '"',
 				object: stream.object.name || stream.object.TaskTitle,
 				type: stream.FeedType,
-				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
+				createAt: moment(stream.CreateDate).fromNow(),
 				picture: stream.theUser.profile_picture
 			};
 		});
@@ -167,7 +181,7 @@ function transformStream(data) {
 				predicate: ' do "'+ ( stream.title || stream.object.PhaseName ) + '"',
 				object: stream.object.name || stream.object.TaskTitle,
 				type: stream.FeedType,
-				createAt: moment(stream.CreateDate).tz('Asia/Jakarta').fromNow(),
+				createAt: moment(stream.CreateDate).fromNow(),
 				picture: stream.theUser.profile_picture
 		};
 	}
