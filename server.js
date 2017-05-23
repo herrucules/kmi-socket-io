@@ -30,6 +30,12 @@ app.get('/stream-update', function (req, res) {
   res.send('');
 });
 
+app.get('/words', function (req, res) {
+  // dmdServices.collabeesSingleStream(io, http.request, req.query.since);
+  io.emit('push-word', req.query.msg)
+  res.send('');
+});
+
 httpApp.listen(port, function(){
   console.log('listening on *:'+port);
 });
