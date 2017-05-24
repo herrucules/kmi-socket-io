@@ -32,8 +32,12 @@ app.get('/stream-update', function (req, res) {
 
 app.get('/words', function (req, res) {
   // dmdServices.collabeesSingleStream(io, http.request, req.query.since);
+  res.send('<form action="/post-words"><input style="width:100%;padding:5px" type="text" name="msg" placeholder="your message will be posted in KMITV"/><br><button type="submit">Post</button></form>');
+});
+
+app.get('/post-words', function (req, res) {
   io.emit('push-word', req.query.msg)
-  res.send('');
+  res.redirect('/words');
 });
 
 httpApp.listen(port, function(){
@@ -51,13 +55,14 @@ io.on('connection', function(socket){
 });
 
 function initPushData() {
-  dmdServices.collabeesStreams(io, http.request);
   dmdServices.totalProject(io, http.request);
+  
+  dmdServices.collabeesStreams(io, http.request);
   
   dmdServices.totalJobRequest(io, http.request);
   
-  dmdServices.mediaPlaylist(io, http.request);
-
   dmdServices.jobPhases(io, http.request);
+
+  dmdServices.mediaPlaylist(io, http.request);
   // ...
 }
