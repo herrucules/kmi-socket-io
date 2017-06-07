@@ -27,6 +27,19 @@ app.get('/media-playlist', function (req, res) {
 
 app.get('/stream-update', function (req, res) {
   dmdServices.collabeesSingleStream(io, http.request, req.query.since);
+
+  setTimeout(2000, function() {
+    dmdServices.totalProject(io, http.request);
+  });
+
+  setTimeout(3000, function() {
+    dmdServices.totalJobRequest(io, http.request);
+  });
+
+  setTimeout(5000, function() {
+    dmdServices.jobPhases(io, http.request);
+  })
+
   res.send('');
 });
 
@@ -42,6 +55,11 @@ app.get('/post-words', function (req, res) {
 
 httpApp.listen(port, function(){
   console.log('listening on *:'+port);
+});
+
+io.configure(function() {
+  io.set('transports', ['websocket']);
+  // io.set('log level', 5);
 });
 
 io.on('connection', function(socket){

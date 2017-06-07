@@ -5,7 +5,7 @@ var moment = require('moment-timezone');
 
 moment.tz.setDefault("Asia/Jakarta");
 
-module.exports.totalProject = function (io, request) {
+module.exports.totalProject = function totalProject(io, request) {
 	utility.fetch(
 		request, 
 		'admin-ajax.php?kmi_tv=1&action=get_project&nonce=1&groupid=1&total=-1&get_total=1',
@@ -16,7 +16,7 @@ module.exports.totalProject = function (io, request) {
 	totalNearDeadlineProject(io, request);
 };
 
-module.exports.totalJobRequest = function (io, request) {
+module.exports.totalJobRequest = function totalJobRequest(io, request) {
 	utility.fetch(
 		request, 
 		'admin-ajax.php?kmi_tv=1&action=get_job_request&groupid=1&nonce=b981def24c&total=-1&get_total=1',
@@ -37,7 +37,7 @@ module.exports.mediaPlaylist = function (io, request) {
 		});
 };
 
-module.exports.jobPhases = function (io, request) {
+module.exports.jobPhases = function jobPhases(io, request) {
 	utility.fetch(
 		request,
 		'admin-ajax.php?action=get_job_request&groupid=1&nonce=b981def24c&total=-1&kmi_tv&completed=0',
@@ -63,12 +63,15 @@ module.exports.collabeesStreams = function (io, request, total) {
 
 module.exports.collabeesSingleStream = function (io, request, since) {
 	since = since || moment().format();
+
+	var stream = transformStream(JSON.parse(res));
+
 	utility.fetch(
 		request,
 		'admin-ajax.php?action=get_feed&kmi_tv&nonce=e07bf53f7a&page=1&total=1&latest='+encodeURI(since),
 		function(res) {
 			io.emit(CONST.PUSH_COLLABEES_STREAM, 
-				JSON.stringify(transformStream(JSON.parse(res)))
+				JSON.stringify(stream)
 				);
 		});
 };
