@@ -18,7 +18,7 @@
   },
   "engines": {
     "node": "5.3.0"
-  }
+  },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.23.0"
   }
