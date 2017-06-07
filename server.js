@@ -57,10 +57,10 @@ httpApp.listen(port, function(){
   console.log('listening on *:'+port);
 });
 
-io.configure(function() {
-  io.set('transports', ['websocket']);
-  // io.set('log level', 5);
-});
+// io.configure(function() {
+//   io.set('transports', ['websocket']);
+//   // io.set('log level', 5);
+// });
 
 io.on('connection', function(socket){
   console.log('a user connected');
