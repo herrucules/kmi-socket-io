@@ -5,7 +5,7 @@ var io = require('socket.io')(httpApp);
 // var bodyParser = require('body-parser');
 // var multer = require('multer'); // v1.0.5
 // var upload = multer(); // for parsing multipart/form-data
-var port = process.env.port || 1337;
+var port = process.env.PORT || 1337;
 var dmdServices = require('./dmdservices');
 
 // app.use(bodyParser.json()); // for parsing application/json
